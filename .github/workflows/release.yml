@@ -1,0 +1,101 @@
+on:
+    workflow_dispatch:
+    push:
+        # Sequence of patterns matched against refs/tags
+        tags:
+            - "v*" # Push events to matching v*, i.e. v1.0, v20.15.10
+
+name: Publish Release
+
+jobs:
+    insiders-build:
+        strategy:
+            matrix:
+                os: [windows, macos, ubuntu]
+                include:
+                    - os: windows
+                      file: copycord-windows.exe
+                      package: ""
+                      artifact: copycord-windows.exe
+                    - os: macos
+                      file: copycord.app
+                      package: tar -czf 'copycord-macos.app.tgz' 'copycord.app'
+                      artifact: copycord-macos.app.tgz
+                    - os: ubuntu
+                      file: copycord
+                      package: chmod +x copycord && tar -czf 'copycord-linux.tgz' 'copycord'
+                      artifact: copycord-linux.tgz
+        runs-on: ${{ matrix.os }}-latest
+        steps:
+            - uses: actions/checkout@v2
+            - uses: actions/setup-node@v2
+              env:
+                  MONGOMS_VERSION: 4.4.3
+              with:
+                  node-version: 14
+            - run: |
+                  cd bundle
+                  npm run setup
+                  npx caxa -i . -m 'This_may_take_a_while_to_run_the_first_time_please_wait...' --output '${{matrix.file}}' -- '{{caxa}}/node_modules/.bin/node' '{{caxa}}/dist/bundle/src/start.js'
+                  ${{ matrix.package }}
+            - uses: actions/upload-artifact@v2
+              with:
+                  name: ${{ matrix.artifact }}
+                  path: bundle/${{ matrix.artifact }}
+
+    release:
+        needs: [insiders-build]
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v2
+            - uses: actions/download-artifact@v2
+              with:
+                  name: copycord-windows.exe
+            - uses: actions/download-artifact@v2
+              with:
+                  name: copycord-macos.app.tgz
+            - uses: actions/download-artifact@v2
+              with:
+                  name: copycord-linux.tgz
+            - uses: actions/create-release@v1
+              id: create-release
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              with:
+                  tag_name: v${{ secrets.RELEASE_VERSION }}
+                  release_name: Server v${{ secrets.RELEASE_VERSION }}
+                  draft: false
+                  prerelease: true # TODO: change this to false
+                  body: >
+                      ## Download
+
+                      - [Windows](https://github.com/copycord/copycord/releases/download/v${{ secrets.RELEASE_VERSION }}/copycord-windows.exe)
+
+                      - [MacOS](https://github.com/copycord/copycord/releases/download/v${{ secrets.RELEASE_VERSION }}/copycord-macos.app.tgz)
+
+                      - [Linux](https://github.com/copycord/copycord/releases/download/v${{ secrets.RELEASE_VERSION }}/copycord-linux.tgz)
+
+            - uses: actions/upload-release-asset@v1
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              with:
+                  upload_url: ${{ steps.create-release.outputs.upload_url }}
+                  asset_path: copycord-windows.exe
+                  asset_name: copycord-windows.exe
+                  asset_content_type: application/vnd.microsoft.portable-executable
+            - uses: actions/upload-release-asset@v1
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              with:
+                  upload_url: ${{ steps.create-release.outputs.upload_url }}
+                  asset_path: copycord-macos.app.tgz
+                  asset_name: copycord-macos.app.tgz
+                  asset_content_type: application/gzip
+            - uses: actions/upload-release-asset@v1
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              with:
+                  upload_url: ${{ steps.create-release.outputs.upload_url }}
+                  asset_path: copycord-linux.tgz
+                  asset_name: copycord-linux.tgz
+                  asset_content_type: application/gzip

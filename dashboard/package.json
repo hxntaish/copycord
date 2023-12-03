@@ -1,0 +1,23 @@
+{
+	"name": "@copycord/dashboard",
+	"version": "1.0.0",
+	"description": "Dashboard for copycord",
+	"main": "dist/index.js",
+	"types": "src/index.ts",
+	"scripts": {
+		"test": "npm run build && npx jest --coverage ./tests",
+		"build": "npx tsc -p .",
+		"start": "node dist/start.js"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/copycord/copycord.git"
+	},
+	"keywords": [],
+	"author": "copycord",
+	"license": "AGPL-3.0-only",
+	"bugs": {
+		"url": "https://github.com/copycord/copycord/issues"
+	},
+	"homepage": "https://github.com/copycord/copycord#readme"
+}

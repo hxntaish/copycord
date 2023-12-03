@@ -1,0 +1,17 @@
+{
+	"name": "copycord-legacy",
+	"version": "1.0.0",
+	"description": "A copycord server written in Node.js",
+	"workspaces": ["api", "cdn", "gateway"],
+	"scripts": {},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/spartanoah/copycord-legacy.git"
+	},
+	"author": "copycord",
+	"license": "AGPL-3.0-only",
+	"bugs": {
+		"url": "https://github.com/spartanoah/copycord-legacy/issues"
+	},
+	"homepage": "https://github.com/spartanoah/copycord-legacy"
+}

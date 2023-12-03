@@ -1,0 +1,11 @@
+blank_issues_enabled: true
+contact_links:
+  - name: copycord Documentation
+    url: https://docs.copycord.com/
+    about: Need documentation and examples for the copycord? Head over to copycord's official documentation.
+  - name: Discord's Developer Documentation
+    url: https://discord.com/developers/docs/intro
+    about: Need help with the Discord resources? Head here instead of asking on copycord!
+  - name: copycord' Official Discord server
+    url: https://discord.com/invite/Ms5Ev7S6bF
+    about: Need help with the server? Talk with us in our official server.
