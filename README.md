@@ -18,3 +18,5 @@ npm run setup
 #Start the bundle server ( API, CDN, Gateway in one )
 npm run start
 ```
+
+### To have all rights on the user, put 197631 on the rights and flags of the user in the database (open it with DBeaver its on bundle/database.db)
